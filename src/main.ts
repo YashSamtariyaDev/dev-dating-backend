@@ -1,9 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsEnabled = process.env.HTTPS === 'true';
+  let httpsOptions;
+
+  if (httpsEnabled) {
+    try {
+      httpsOptions = {
+        key: readFileSync(join(process.cwd(), 'ssl', 'server.key')),
+        cert: readFileSync(join(process.cwd(), 'ssl', 'server.crt')),
+      };
+    } catch (err) {
+      Logger.warn('HTTPS enabled but SSL certificates not found in ./ssl/. Falling back to HTTP.', 'Bootstrap');
+    }
+  }
+
+  const app = await NestFactory.create(AppModule, httpsOptions ? { httpsOptions } : undefined);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -13,6 +29,10 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? (httpsEnabled ? 443 : 3000);
+  await app.listen(port);
+
+  const protocol = httpsOptions ? 'https' : 'http';
+  Logger.log(`🚀 Application is running on: ${protocol}://localhost:${port}`, 'Bootstrap');
 }
 bootstrap();

@@ -14,7 +14,7 @@ export class ProfileCompletedGuard implements CanActivate {
     }
 
     const isCompleted = await this.profileService.isProfileCompleted(
-      user.userId,
+      Number(user.userId),
     );
 
     if (!isCompleted) {

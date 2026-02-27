@@ -22,7 +22,7 @@ export class UsersController {
     @UseGuards(JwtAuthGuard, ProfileCompletedGuard)
     @Get('browse')
     browse(@CurrentUser() user) {
-        return this.usersService.browseUsers(user.userId);
+        return this.usersService.browseUsers(Number(user.userId));
     }
 
 

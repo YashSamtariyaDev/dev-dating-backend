@@ -14,8 +14,8 @@ export enum UserActionType {
 
 @Entity('user_actions')
 export class UserAction {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   fromUser: User;

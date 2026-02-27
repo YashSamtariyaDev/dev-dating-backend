@@ -38,7 +38,7 @@ export class UsersService {
   }
 
   // 🔹 Find by ID
-  async findById(id: string): Promise<User> {
+  async findById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
     });
@@ -63,7 +63,7 @@ export class UsersService {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
-  async browseUsers(currentUserId: string) {
+  async browseUsers(currentUserId: number) {
     // Get users already acted upon
     const actions = await this.actionRepo.find({
       where: { fromUser: { id: currentUserId } },

@@ -16,7 +16,7 @@ export class ProfileService {
   ) {}
 
   // 🔹 AUTO-CREATE PROFILE IF NOT EXISTS
-  async getOrCreateProfile(userId: string): Promise<Profile> {
+  async getOrCreateProfile(userId: number): Promise<Profile> {
     let profile = await this.profileRepo.findOne({
       where: { user: { id: userId } },
       relations: ['user'],
@@ -42,7 +42,7 @@ export class ProfileService {
   }
 
   // 🔹 UPDATE PROFILE
-  async updateProfile(userId: string, data: UpdateProfileDto) {
+  async updateProfile(userId: number, data: UpdateProfileDto) {
     const profile = await this.getOrCreateProfile(userId);
 
     Object.assign(profile, data);
@@ -59,7 +59,7 @@ export class ProfileService {
     return this.profileRepo.save(profile);
   }
 
-  async isProfileCompleted(userId: string): Promise<boolean> {
+  async isProfileCompleted(userId: number): Promise<boolean> {
     const profile = await this.profileRepo.findOne({
       where: { user: { id: userId } },
     });

@@ -23,8 +23,8 @@ export enum Gender {
 
 @Entity('profiles')
 export class Profile {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @OneToOne(() => User, user => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn()

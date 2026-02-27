@@ -17,7 +17,7 @@ export class ProfileController {
 
   @Get('me')
   getMyProfile(@CurrentUser() user) {
-    return this.profileService.getOrCreateProfile(user.userId);
+    return this.profileService.getOrCreateProfile(Number(user.userId));
   }
 
   @Patch('me')
@@ -25,6 +25,6 @@ export class ProfileController {
     @CurrentUser() user,
     @Body() dto: UpdateProfileDto,
   ) {
-    return this.profileService.updateProfile(user.userId, dto);
+    return this.profileService.updateProfile(Number(user.userId), dto);
   }
 }
