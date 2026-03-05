@@ -25,5 +25,10 @@ export class UsersController {
         return this.usersService.browseUsers(Number(user.userId));
     }
 
+    @UseGuards(JwtAuthGuard, ProfileCompletedGuard)
+    @Get('discover')
+    discover(@CurrentUser() user) {
+        return this.usersService.discoverUsers(Number(user.userId));
+    }
 
 }

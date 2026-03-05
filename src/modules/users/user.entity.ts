@@ -19,6 +19,9 @@ export class User {
   @Column({ length: 100 })
   email: string;
 
+  @Column({ length: 100 })
+  name: string;
+
   @Column()
   password: string; // hashed
 

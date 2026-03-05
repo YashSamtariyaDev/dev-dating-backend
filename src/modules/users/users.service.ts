@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { UserRole } from './user-role.enum';
 import { UserAction } from './dto/user-action.entity';
+import { MatchingService } from '../matching/matching.service';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,9 @@ export class UsersService {
 
      @InjectRepository(UserAction)
     private actionRepo: Repository<UserAction>,
+
+    private readonly matchingService: MatchingService,
+
   ) {}
 
   // 🔹 Create User
@@ -80,4 +84,28 @@ export class UsersService {
       .andWhere('profile.isComplete = true')
       .getMany();
   }
+
+  async discoverUsers(userId: number) {
+
+  const swipedUserIds =
+    await this.matchingService.getSwipedUserIds(userId);
+
+  const matchedUserIds =
+    await this.matchingService.getMatchedUserIds(userId);
+
+  const excludedIds = [
+    userId,
+    ...swipedUserIds,
+    ...matchedUserIds,
+  ];
+
+  const users = await this.userRepository.find({
+    where: {
+      id: Not(In(excludedIds)),
+    },
+    take: 20,
+  });
+
+  return users;
+}
 }

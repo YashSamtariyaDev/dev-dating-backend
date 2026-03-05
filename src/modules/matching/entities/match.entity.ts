@@ -6,6 +6,7 @@ import {
   Column,
   Unique,
   Index,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/user.entity';
 
@@ -15,12 +16,12 @@ export class Match {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @Index()
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user1Id' })
   user1: User;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @Index()
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user2Id' })
   user2: User;
 
   @CreateDateColumn()

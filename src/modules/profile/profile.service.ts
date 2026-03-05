@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from './profile.entity';
-import { User } from '../users/user.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ProfileService {
@@ -11,25 +11,20 @@ export class ProfileService {
     @InjectRepository(Profile)
     private readonly profileRepo: Repository<Profile>,
 
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
-  ) {}
+    private readonly usersService: UsersService
+  ) { }
 
   // 🔹 AUTO-CREATE PROFILE IF NOT EXISTS
   async getOrCreateProfile(userId: number): Promise<Profile> {
+
     let profile = await this.profileRepo.findOne({
       where: { user: { id: userId } },
       relations: ['user'],
     });
 
     if (!profile) {
-      const user = await this.userRepo.findOne({
-        where: { id: userId },
-      });
 
-      if (!user) {
-        throw new Error('User not found');
-      }
+      const user = await this.usersService.findById(userId);
 
       profile = this.profileRepo.create({
         user,

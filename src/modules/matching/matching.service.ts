@@ -92,4 +92,57 @@ export class MatchingService {
       return { message: 'Swipe recorded' };
     });
   }
+
+  async getUserMatches(userId: number) {
+    const matches = await this.matchRepo.find({
+      where: [
+        { user1: { id: userId } },
+        { user2: { id: userId } },
+      ],
+      relations: ['user1', 'user2'],
+      order: { matchedAt: 'DESC' },
+    });
+
+    // Return only the other user
+    return matches.map(match => {
+      const otherUser =
+        match?.user1.id === userId ? match.user2 : match.user1;
+
+      return {
+        matchId: match.id,
+        matchedAt: match.matchedAt,
+        user: {
+          id: otherUser.id,
+          email: otherUser.email,
+          name: otherUser.name,
+        },
+      };
+    });
+  }
+
+  async getSwipedUserIds(userId: number) {
+    const swipes = await this.swipeRepo.find({
+      where: { swiper: { id: userId } },
+      relations: ['target'],
+    });
+
+    return swipes.map(s => s.target.id);
+  }
+
+  async getMatchedUserIds(userId: number) {
+    const matches = await this.matchRepo.find({
+      where: [
+        { user1: { id: userId } },
+        { user2: { id: userId } },
+      ],
+      relations: ['user1', 'user2'],
+    });
+
+    return matches.map(match =>
+      match.user1.id === userId
+        ? match.user2.id
+        : match.user1.id,
+    );
+  }
+
 }
