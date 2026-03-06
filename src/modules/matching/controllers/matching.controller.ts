@@ -5,11 +5,11 @@ import {
   UseGuards,
   Get,
 } from '@nestjs/common';
-import { MatchingService } from './matching.service';
-import { CreateSwipeDto } from './dto/create-swipe.dto';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { ProfileCompletedGuard } from '../../common/guards/profile-completed.guard';
+import { MatchingService } from '../services/matching.service';
+import { CreateSwipeDto } from '../dto/create-swipe.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { ProfileCompletedGuard } from 'src/common/guards/profile-completed.guard';
 
 @Controller('matching')
 @UseGuards(JwtAuthGuard)

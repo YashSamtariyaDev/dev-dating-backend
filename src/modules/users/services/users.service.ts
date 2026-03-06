@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from './user.entity';
-import { UserRole } from './user-role.enum';
-import { UserAction } from './dto/user-action.entity';
-import { MatchingService } from '../matching/matching.service';
+import { User } from '../entities/user.entity';
+import { UserRole } from '../enum/user-role.enum';
+import { UserAction } from '../entities/user-action.entity';
+import { MatchingService } from '../../matching/services/matching.service';
 
 @Injectable()
 export class UsersService {
@@ -16,17 +17,19 @@ export class UsersService {
      @InjectRepository(UserAction)
     private actionRepo: Repository<UserAction>,
 
+    @Inject(forwardRef(() => MatchingService))
     private readonly matchingService: MatchingService,
 
   ) {}
 
   // 🔹 Create User
-  async createUser(data: { email: string; password: string }): Promise<User> {
+  async createUser(data: { email: string; password: string; name: string }): Promise<User> {
   const hashedPassword = await bcrypt.hash(data.password, 12);
 
   const user = this.userRepository.create({
     email: data.email,
     password: hashedPassword,
+    name: data.name,
     role: UserRole.USER,
   });
 

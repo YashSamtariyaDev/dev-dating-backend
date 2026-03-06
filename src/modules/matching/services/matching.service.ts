@@ -2,12 +2,15 @@ import {
   Injectable,
   BadRequestException,
 } from '@nestjs/common';
+import { Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Match } from './entities/match.entity';
-import { User } from '../users/user.entity';
-import { CreateSwipeDto } from './dto/create-swipe.dto';
-import { Swipe, SwipeType } from './entities/swipe.entity';
+import { Match } from '../entities/match.entity';
+import { CreateSwipeDto } from '../dto/create-swipe.dto';
+import { Swipe, SwipeType } from '../entities/swipe.entity';
+import { UsersService } from '../../users/services/users.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MatchCreatedEvent } from '../events/match-created.event';
 
 @Injectable()
 export class MatchingService {
@@ -18,10 +21,12 @@ export class MatchingService {
     @InjectRepository(Match)
     private readonly matchRepo: Repository<Match>,
 
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
 
     private readonly dataSource: DataSource,
+
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createSwipe(userId: number, dto: CreateSwipeDto) {
@@ -29,12 +34,12 @@ export class MatchingService {
       throw new BadRequestException('You cannot swipe yourself');
     }
 
-    const swiper = await this.userRepo.findOneBy({ id: userId });
+    const swiper = await this.usersService.findById(userId);
     if (!swiper) {
       throw new BadRequestException('User not found');
     }
 
-    const target = await this.userRepo.findOneBy({ id: dto.targetId });
+    const target = await this.usersService.findById(dto.targetId);
     if (!target) {
     throw new BadRequestException('Target user not found');
     }
@@ -80,7 +85,16 @@ export class MatchingService {
             user2: target,
           });
 
-          await manager.save(match);
+          const savedMatch = await manager.save(match);
+
+          this.eventEmitter.emit(
+            'match.created',
+            new MatchCreatedEvent(
+              savedMatch.id,
+              swiper.id,
+              target.id,
+            ),
+          );
 
           return {
             message: 'It’s a match!',
@@ -145,4 +159,10 @@ export class MatchingService {
     );
   }
 
+  async getMatchById(matchId: number): Promise<Match | null> {
+    return this.matchRepo.findOne({
+      where: { id: matchId },
+      relations: ['user1', 'user2'],
+    });
+  }
 }

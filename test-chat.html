@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat Test</title>
+    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .input-group { margin: 10px 0; }
+        input { padding: 8px; margin: 5px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #messages { border: 1px solid #ccc; height: 400px; overflow-y: scroll; padding: 10px; margin-top: 20px; background: #f9f9f9; }
+        .message { margin: 5px 0; padding: 8px; border-radius: 5px; }
+        .system { background: #e9ecef; color: #6c757d; }
+        .user { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 WebSocket Chat Test</h1>
+        
+        <div class="input-group">
+            <input type="text" id="token" placeholder="Paste JWT Token here" style="width: 400px">
+            <button onclick="connect()">🔗 Connect</button>
+        </div>
+        
+        <div class="input-group">
+            <input type="number" id="chatRoomId" placeholder="Chat Room ID" style="width: 200px">
+            <button onclick="joinRoom()">📱 Join Room</button>
+            <button onclick="leaveRoom()">🚪 Leave Room</button>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="message" placeholder="Type your message..." style="width: 400px">
+            <button onclick="sendMessage()">💬 Send</button>
+        </div>
+        
+        <div id="messages"></div>
+    </div>
+    
+    <script>
+        let socket;
+        let currentUserId = null;
+        
+        function addMessage(text, type = 'system') {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${text}`;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${text}`);
+        }
+        
+        function connect() {
+            const token = document.getElementById('token').value.trim();
+            
+            if (!token) {
+                addMessage('Please enter a JWT token', 'error');
+                return;
+            }
+            
+            addMessage('Connecting to WebSocket...', 'system');
+            
+            socket = io('http://localhost:3000', {
+                auth: {
+                    token: token
+                },
+                transports: ['websocket'],
+                forceNew: true,
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+            });
+            
+            socket.on('connect', () => {
+                addMessage('✅ Connected to chat server', 'system');
+            });
+            
+            socket.on('disconnect', () => {
+                addMessage('❌ Disconnected from chat server', 'error');
+            });
+            
+            socket.on('newMessage', (data) => {
+                addMessage(`User ${data.senderId}: ${data.content}`, 'user');
+            });
+            
+            socket.on('userJoined', (data) => {
+                addMessage(data.message, 'system');
+            });
+            
+            socket.on('userLeft', (data) => {
+                addMessage(data.message, 'system');
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.error('❌ Connection error:', error);
+                addMessage(`Connection error: ${error.message}`, 'error');
+                addMessage('Trying to reconnect...', 'system');
+            });
+            
+            socket.on('connect_timeout', (timeout) => {
+                console.error('❌ Connection timeout:', timeout);
+                addMessage('Connection timeout', 'error');
+            });
+            
+            socket.on('reconnect', (attemptNumber) => {
+                console.log('🔄 Reconnected after', attemptNumber, 'attempts');
+                addMessage(`Reconnected (attempt ${attemptNumber})`, 'system');
+            });
+            
+            socket.on('reconnect_error', (error) => {
+                console.error('❌ Reconnection error:', error);
+                addMessage(`Reconnection failed: ${error.message}`, 'error');
+            });
+            
+            socket.on('reconnect_failed', () => {
+                console.error('❌ Reconnection failed');
+                addMessage('Failed to reconnect after multiple attempts', 'error');
+            });
+        }
+        
+        function joinRoom() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            
+            if (!chatRoomId || !socket) {
+                addMessage('Please enter room ID and connect first', 'error');
+                return;
+            }
+            
+            socket.emit('joinRoom', { chatRoomId });
+            addMessage(`Joining room ${chatRoomId}...`, 'system');
+        }
+        
+        function leaveRoom() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            
+            if (!chatRoomId || !socket) {
+                addMessage('Please enter room ID and connect first', 'error');
+                return;
+            }
+            
+            socket.emit('leaveRoom', { chatRoomId });
+            addMessage(`Leaving room ${chatRoomId}...`, 'system');
+        }
+        
+        function sendMessage() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            const message = document.getElementById('message').value.trim();
+            
+            if (!chatRoomId || !message || !socket) {
+                addMessage('Please enter room ID, message and connect first', 'error');
+                return;
+            }
+            
+            socket.emit('sendMessage', {
+                chatRoomId: chatRoomId,
+                content: message
+            });
+            
+            document.getElementById('message').value = '';
+            addMessage(`You: ${message}`, 'user');
+        }
+        
+        // Enter key to send message
+        document.getElementById('message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Auto-connect if token in URL
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (token) {
+                document.getElementById('token').value = token;
+                connect();
+            }
+        };
+    </script>
+</body>
+</html>

@@ -7,8 +7,8 @@ import {
   Index,
   OneToOne,
 } from 'typeorm';
-import { UserRole } from './user-role.enum';
-import { Profile } from '../profile/profile.entity';
+import { UserRole } from '../enum/user-role.enum';
+import { Profile } from '../../profile/entities/profile.entity';
 
 @Entity('users')
 export class User {

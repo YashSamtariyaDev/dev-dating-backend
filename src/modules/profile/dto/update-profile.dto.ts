@@ -5,7 +5,7 @@ import {
   IsEnum,
   IsUrl,
 } from 'class-validator';
-import { ExperienceLevel, Gender } from '../profile.entity';
+import { ExperienceLevel, Gender } from '../entities/profile.entity';
 
 export class UpdateProfileDto {
   @IsOptional()

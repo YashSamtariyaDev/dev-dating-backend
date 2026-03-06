@@ -1,5 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from "@nestjs/common";
-import { ProfileService } from "src/modules/profile/profile.service";
+import { ProfileService } from "../../modules/profile/services/profile.service";
 
 @Injectable()
 export class ProfileCompletedGuard implements CanActivate {

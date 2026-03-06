@@ -281,3 +281,9 @@ The project is in **early development phase** with core authentication and user 
 3. Simple chat functionality
 
 **Technical Debt**: Minimal, code follows NestJS best practices with proper separation of concerns.
+
+
+
+CMD-
+npm run typeorm -- migration:generate src/migrations/create-chat-tables
+npm run typeorm -- migration:run

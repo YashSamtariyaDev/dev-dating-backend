@@ -5,13 +5,21 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { MatchingModule } from './modules/matching/matching.module';
+import { ChatModule } from './modules/chat/chat.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { databaseConfig } from './config/database.config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-  imports: [AuthModule, UsersModule, ProfileModule, MatchingModule,
+  imports: [
+    EventEmitterModule.forRoot(),
+    AuthModule,
+    UsersModule,
+    ProfileModule,
+    MatchingModule,
+    ChatModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

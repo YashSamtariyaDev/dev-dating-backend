@@ -5,8 +5,8 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { ProfileService } from './profile.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ProfileService } from '../services/profile.service';
+import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
