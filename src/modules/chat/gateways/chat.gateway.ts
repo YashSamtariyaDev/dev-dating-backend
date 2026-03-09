@@ -12,11 +12,20 @@ import {
 import { Server, Socket } from 'socket.io';
 import { MessageService } from '../../message/services/message.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:8081', 'http://127.0.0.1:8081', 'file://'],
+    origin: [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'https://localhost:3000',
+      'https://127.0.0.1:3000',
+      'http://localhost:8081',
+      'http://127.0.0.1:8081',
+      'https://localhost:8081',
+      'https://127.0.0.1:8081',
+      'file://',
+    ],
     credentials: true,
   },
   transports: ['websocket', 'polling'],
@@ -24,6 +33,8 @@ import { UnauthorizedException } from '@nestjs/common';
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
+
+  private onlineUsers = new Map<number, string>();
 
   constructor(
     private readonly messageService: MessageService,
@@ -57,6 +68,46 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   handleDisconnect(client: Socket) {
     console.log('🔌 Client disconnected:', client.id);
+    
+    // Find and remove user from online users
+    for (const [userId, socketId] of this.onlineUsers.entries()) {
+      if (socketId === client.id) {
+        this.onlineUsers.delete(userId);
+        this.server.emit('userOffline', userId);
+        break;
+      }
+    }
+  }
+
+  @SubscribeMessage('register')
+  registerUser(
+    @MessageBody() data: { userId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.onlineUsers.set(data.userId, client.id);
+    this.server.emit('userOnline', data.userId);
+    
+    return {
+      success: true,
+      userId: data.userId,
+      onlineCount: this.onlineUsers.size,
+    };
+  }
+
+  @SubscribeMessage('getOnlineUsers')
+  getOnlineUsers() {
+    return {
+      onlineUsers: Array.from(this.onlineUsers.keys()),
+      count: this.onlineUsers.size,
+    };
+  }
+
+  @SubscribeMessage('isUserOnline')
+  isUserOnline(@MessageBody() data: { userId: number }) {
+    return {
+      userId: data.userId,
+      isOnline: this.onlineUsers.has(data.userId),
+    };
   }
 
   // Join chat room
@@ -72,6 +123,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     client.join(`room-${chatRoomId}`);
 
+    // await this.messageService.markAsDelivered(chatRoomId, userId);
+
+    // this.server.to(`room-${chatRoomId}`).emit('messagesDelivered', {
+    //   chatRoomId,
+    //   userId,
+    // });
+
     // Notify others in room
     client.to(`room-${chatRoomId}`).emit('userJoined', {
       userId,
@@ -85,6 +143,50 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       chatRoomId,
       userId,
     };
+  }
+
+  @SubscribeMessage('markRead')
+  async markRead(
+    @MessageBody() data: { chatRoomId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { chatRoomId } = data;
+    const userId = client.data.userId;
+
+    console.log(`✅ User ${userId} marking messages read in room ${chatRoomId}`);
+
+    // await this.messageService.markAsRead(chatRoomId, userId);
+
+    // this.server.to(`room-${chatRoomId}`).emit('messagesRead', {
+    //   chatRoomId,
+    //   userId,
+    // });
+
+    return {
+      success: true,
+      chatRoomId,
+      userId,
+    };
+  }
+
+  @SubscribeMessage('typing')
+  handleTyping(
+    @MessageBody() data: { chatRoomId: number; userId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.server
+      .to(`room-${data.chatRoomId}`)
+      .emit('userTyping', data);
+  }
+
+  @SubscribeMessage('stopTyping')
+  handleStopTyping(
+    @MessageBody() data: { chatRoomId: number; userId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.server
+      .to(`room-${data.chatRoomId}`)
+      .emit('userStoppedTyping', data);
   }
 
   // Send message realtime

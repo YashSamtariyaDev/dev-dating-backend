@@ -21,6 +21,12 @@ export enum Gender {
   OTHER = 'other',
 }
 
+export enum LookingFor {
+  MALE = 'male',
+  FEMALE = 'female',
+  BOTH = 'both',
+}
+
 @Entity('profiles')
 export class Profile {
   @PrimaryGeneratedColumn()
@@ -30,14 +36,35 @@ export class Profile {
   @JoinColumn()
   user: User;
 
-  @Column({ nullable: true })
-  bio: string;
-
   @Column({ type: 'enum', enum: Gender, nullable: true })
   gender: Gender;
 
+  @Column({ type: 'enum', enum: LookingFor, nullable: true })
+  lookingFor: LookingFor;
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth: Date;
+
   @Column({ nullable: true })
-  lookingFor: string;
+  age: number; // Calculated field, but we'll store it for performance
+
+  @Column({ nullable: true })
+  minAge: number;
+
+  @Column({ nullable: true })
+  maxAge: number;
+
+  @Column({ nullable: true })
+  maxDistance: number; // in kilometers
+
+  @Column({ type: 'decimal', precision: 10, scale: 8, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
+  longitude: number;
+
+  @Column({ nullable: true })
+  bio: string;
 
   @Column({ type: 'json', nullable: true })
   techStack: string[];

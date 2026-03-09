@@ -6,6 +6,9 @@ import { UsersModule } from './modules/users/users.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { RecommendationModule } from './modules/recommendation/recommendation.module';
+import { MailModule } from './modules/mail/mail.module';
+import { AccountModule } from './modules/account/account.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -20,6 +23,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     ProfileModule,
     MatchingModule,
     ChatModule,
+    RecommendationModule,
+    MailModule,
+    AccountModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

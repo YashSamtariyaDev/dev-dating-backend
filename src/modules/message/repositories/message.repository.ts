@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Message } from '../entities/message.entity';
+import { Message, MessageStatus } from '../entities/message.entity';
 
 @Injectable()
 export class MessageRepository {
@@ -10,11 +10,29 @@ export class MessageRepository {
     private readonly messageRepo: Repository<Message>,
   ) {}
 
-  async getMessages(chatRoomId: number) {
+  async getAllMessages(chatRoomId: number) {
     return this.messageRepo.find({
       where: { chatRoomId },
       order: { createdAt: 'ASC' },
     });
+  }
+
+  async getMessages(chatRoomId: number, page = 1, limit = 20) {
+    return this.messageRepo.find({
+      where: { chatRoomId },
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  }
+
+  async getUnreadCount(chatRoomId: number, userId: number) {
+    return this.messageRepo
+      .createQueryBuilder('message')
+      .where('message.chatRoomId = :chatRoomId', { chatRoomId })
+      .andWhere('message.senderId != :userId', { userId })
+      .andWhere('message.status = :status', { status: MessageStatus.SENT })
+      .getCount();
   }
 
   async createMessage(chatRoomId: number, senderId: number, content: string) {
@@ -25,5 +43,33 @@ export class MessageRepository {
     });
 
     return this.messageRepo.save(message);
+  }
+
+  async markAsDelivered(chatRoomId: number, userId: number) {
+    await this.messageRepo
+      .createQueryBuilder()
+      .update(Message)
+      .set({
+        status: MessageStatus.DELIVERED,
+        deliveredAt: () => 'CURRENT_TIMESTAMP',
+      })
+      .where('chat_room_id = :chatRoomId', { chatRoomId })
+      .andWhere('sender_id != :userId', { userId })
+      .andWhere('status = :status', { status: MessageStatus.SENT })
+      .execute();
+  }
+
+  async markAsRead(chatRoomId: number, userId: number) {
+    await this.messageRepo
+      .createQueryBuilder()
+      .update(Message)
+      .set({
+        status: MessageStatus.READ,
+        readAt: () => 'CURRENT_TIMESTAMP',
+      })
+      .where('chat_room_id = :chatRoomId', { chatRoomId })
+      .andWhere('sender_id != :userId', { userId })
+      .andWhere('status != :status', { status: MessageStatus.READ })
+      .execute();
   }
 }

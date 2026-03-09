@@ -5,6 +5,12 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
+export enum MessageStatus {
+  SENT = 'sent',
+  DELIVERED = 'delivered',
+  READ = 'read',
+}
+
 @Entity('messages')
 export class Message {
   @PrimaryGeneratedColumn()
@@ -18,6 +24,20 @@ export class Message {
 
   @Column({ name: 'message' })
   content: string;
+
+  @Column({
+    name: 'status',
+    type: 'enum',
+    enum: MessageStatus,
+    default: MessageStatus.SENT,
+  })
+  status: MessageStatus;
+
+  @Column({ name: 'delivered_at', type: 'datetime', nullable: true })
+  deliveredAt: Date | null;
+
+  @Column({ name: 'read_at', type: 'datetime', nullable: true })
+  readAt: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;

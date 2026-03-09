@@ -1,0 +1,877 @@
+{
+	"info": {
+		"_postman_id": "e09b4e37-a060-4ee8-896e-46543bfa0dc0",
+		"name": "DevDating Backend - Complete API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39904540"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "http://localhost:3000/auth/login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"t12@devdating.com\",\n  \"password\": \"123456\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/auth/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/auth/register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"t12@devdating.com\",\n  \"password\": \"123456\",\n  \"name\": \"t12\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/auth/register",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profiles",
+			"item": [
+				{
+					"name": "http://localhost:3000/profile/me",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/profile/me",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"profile",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/profile/me",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bio\": \"Full-stack developer passionate about building amazing apps!\",\n  \"age\": 28,\n  \"minAge\": 25,\n  \"maxAge\": 35,\n  \"maxDistance\": 50,\n  \"location\": \"San Francisco, CA\",\n  \"gender\": \"male\",\n  \"lookingFor\": \"female\",\n  \"techStack\": [\"JavaScript\", \"TypeScript\", \"React\", \"Node.js\"],\n  \"experienceLevel\": \"senior\",\n  \"githubUrl\": \"https://github.com/example\",\n  \"linkedinUrl\": \"https://linkedin.com/in/example\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/profile/me",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"profile",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/profile/upload-photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "https://localhost:3000/profile/upload-photo",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"profile",
+								"upload-photo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "https://localhost:3000/users/feed - Recommendation Feed",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/users/feed?page=1&limit=20&minAge=25&maxAge=35&maxDistance=50",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"users",
+								"feed"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "minAge",
+									"value": "25"
+								},
+								{
+									"key": "maxAge",
+									"value": "35"
+								},
+								{
+									"key": "maxDistance",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/users/feed/stats - Feed Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/users/feed/stats",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"users",
+								"feed",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/users/all-users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImVtYWlsIjoidTFAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNDU2MTkyLCJleHAiOjE3NzI0NTcwOTJ9.LAKLMby5IEEWcMFyFKlBjgouiyBqvysP9FQHKJ9se2A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/users/all-users",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"users",
+								"all-users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:3000/users/browse",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoidTNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNDU3Mzg0LCJleHAiOjE3NzI0NTgyODR9.I4qv0qG1bkOqlqHvcT-vDT-nqRulN1sQ-oAxbfMktqg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/users/browse",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"users",
+								"browse"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Matches",
+			"item": [
+				{
+					"name": "https://localhost:3000/matching/swipe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoidDEyQGRldmRhdGluZy5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc3Mjc5Mjc3NiwiZXhwIjoxNzcyODIxNTc2fQ.i152v5BIBhhENmQg4NANf3rOPwmMy0kRrl_3zryDd4c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"targetId\": 8,\n  \"type\": \"LIKE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/matching/swipe",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"matching",
+								"swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/matching/matches",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoidDEyQGRldmRhdGluZy5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc3Mjc5NjAwNywiZXhwIjoxNzcyODI0ODA3fQ.pNimP0GCll3caHnY_H02H45lc9LHK4THR9A_KMlh6uA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"targetId\": 4,\n  \"type\": \"LIKE\"\n}"
+						},
+						"url": {
+							"raw": "https://localhost:3000/matching/matches",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"matching",
+								"matches"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/users/discover",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjUsImVtYWlsIjoidDFAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMjY5LCJleHAiOjE3NzI4MjAwNjl9.FdbzC0bDfwyrSunUVQq1M9XPv556iM0zU_eRI2PmnTQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/users/discover",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"users",
+								"discover"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat_Room",
+			"item": [
+				{
+					"name": "https://localhost:3000/chat/message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoidDEyQGRldmRhdGluZy5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc3Mjc5NjAwNywiZXhwIjoxNzcyODI0ODA3fQ.pNimP0GCll3caHnY_H02H45lc9LHK4THR9A_KMlh6uA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"chatRoomId\": 1,\n  \"content\": \"what'up!\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/chat/message",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"chat",
+								"message"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/chat/:chat_room_id/messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoidDEyQGRldmRhdGluZy5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc3Mjc5NjAwNywiZXhwIjoxNzcyODI0ODA3fQ.pNimP0GCll3caHnY_H02H45lc9LHK4THR9A_KMlh6uA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/chat/1/messages",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"chat",
+								"1",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Messages",
+			"item": [
+				{
+					"name": "https://localhost:3000/messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoidDEyQGRldmRhdGluZy5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc3Mjc5NjAwNywiZXhwIjoxNzcyODI0ODA3fQ.pNimP0GCll3caHnY_H02H45lc9LHK4THR9A_KMlh6uA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"chatRoomId\": 1,\n  \"content\": \"me kiya hello ji!\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/messages",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/messages/:chat_room_id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjksImVtYWlsIjoidDEyQGRldmRhdGluZy5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc3Mjc5NjAwNywiZXhwIjoxNzcyODI0ODA3fQ.pNimP0GCll3caHnY_H02H45lc9LHK4THR9A_KMlh6uA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/messages/1",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"messages",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Account Management",
+			"item": [
+				{
+					"name": "https://localhost:3000/account/send-verification - Email Verification",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/account/send-verification",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"send-verification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/account/deactivate - Deactivate Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/account/deactivate",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/account/reactivate - Reactivate Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/account/reactivate",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"reactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/account/request-deletion - Request Account Deletion",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/account/request-deletion",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"request-deletion"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat System - Enhanced",
+			"item": [
+				{
+					"name": "https://localhost:3000/chat-rooms/my - Get My Chats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/chat-rooms/my",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"chat-rooms",
+								"my"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/chat-rooms/send-message - Send Message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Hello! This is a test message from enhanced chat.\",\n  \"chatRoomId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:3000/chat-rooms/send-message",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"chat-rooms",
+								"send-message"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/chat-rooms/1/messages - Get Messages with Pagination",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/chat-rooms/1/messages?page=1&limit=20",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"chat-rooms",
+								"1",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://localhost:3000/chat-rooms/1/unread-count - Get Unread Count",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsImVtYWlsIjoidDNAZGV2ZGF0aW5nLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNzkxMzEwLCJleHAiOjE3NzI4MjAxMTB9._j8ChVlAQBaTt8HZ3ziNE16PNH7Lc5TIq-iCJimhmPc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:3000/chat-rooms/1/unread-count",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"chat-rooms",
+								"1",
+								"unread-count"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -24,16 +24,31 @@
             <input type="text" id="token" placeholder="Paste JWT Token here" style="width: 400px">
             <button onclick="connect()">🔗 Connect</button>
         </div>
+
+        <div class="input-group">
+            <input type="text" id="socketUrl" placeholder="Socket URL" style="width: 400px" value="https://localhost:3000">
+            <small style="display: block; margin-top: 5px; color: #666;">💡 Access this page via https://localhost:8443 to avoid mixed-content issues</small>
+        </div>
         
         <div class="input-group">
             <input type="number" id="chatRoomId" placeholder="Chat Room ID" style="width: 200px">
             <button onclick="joinRoom()">📱 Join Room</button>
             <button onclick="leaveRoom()">🚪 Leave Room</button>
+            <button onclick="markRead()">✅ Mark Read</button>
+            <button onclick="getUnreadCount()">🔢 Unread Count</button>
         </div>
         
         <div class="input-group">
-            <input type="text" id="message" placeholder="Type your message..." style="width: 400px">
+            <input type="text" id="message" placeholder="Type your message..." style="width: 300px">
             <button onclick="sendMessage()">💬 Send</button>
+            <button onclick="sendTyping()">⌨️ Typing</button>
+            <button onclick="sendStopTyping()">⏹️ Stop Typing</button>
+        </div>
+        
+        <div class="input-group">
+            <button onclick="registerUser()">👤 Register Online</button>
+            <button onclick="getOnlineUsers()">🌐 Get Online Users</button>
+            <button onclick="testPagination()">📄 Test Pagination</button>
         </div>
         
         <div id="messages"></div>
@@ -42,6 +57,23 @@
     <script>
         let socket;
         let currentUserId = null;
+
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                if (!base64Url) return null;
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(
+                    atob(base64)
+                        .split('')
+                        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                        .join(''),
+                );
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return null;
+            }
+        }
         
         function addMessage(text, type = 'system') {
             const messages = document.getElementById('messages');
@@ -55,6 +87,7 @@
         
         function connect() {
             const token = document.getElementById('token').value.trim();
+            const socketUrl = document.getElementById('socketUrl').value.trim();
             
             if (!token) {
                 addMessage('Please enter a JWT token', 'error');
@@ -62,8 +95,11 @@
             }
             
             addMessage('Connecting to WebSocket...', 'system');
+
+            const jwtPayload = parseJwt(token);
+            currentUserId = jwtPayload?.sub ?? null;
             
-            socket = io('http://localhost:3000', {
+            socket = io(socketUrl, {
                 auth: {
                     token: token
                 },
@@ -72,6 +108,7 @@
                 reconnection: true,
                 reconnectionAttempts: 5,
                 reconnectionDelay: 1000,
+                rejectUnauthorized: false, // Ignore SSL certificate errors
             });
             
             socket.on('connect', () => {
@@ -83,7 +120,10 @@
             });
             
             socket.on('newMessage', (data) => {
-                addMessage(`User ${data.senderId}: ${data.content}`, 'user');
+                const label = (currentUserId !== null && Number(data.senderId) === Number(currentUserId))
+                    ? 'You'
+                    : `User ${data.senderId}`;
+                addMessage(`${label}: ${data.content}`, 'user');
             });
             
             socket.on('userJoined', (data) => {
@@ -92,6 +132,22 @@
             
             socket.on('userLeft', (data) => {
                 addMessage(data.message, 'system');
+            });
+            
+            socket.on('userTyping', (data) => {
+                addMessage(`User ${data.userId} is typing...`, 'system');
+            });
+            
+            socket.on('userStoppedTyping', (data) => {
+                addMessage(`User ${data.userId} stopped typing`, 'system');
+            });
+            
+            socket.on('userOnline', (userId) => {
+                addMessage(`User ${userId} is now online`, 'system');
+            });
+            
+            socket.on('userOffline', (userId) => {
+                addMessage(`User ${userId} is now offline`, 'system');
             });
             
             socket.on('connect_error', (error) => {
@@ -129,8 +185,28 @@
                 return;
             }
             
-            socket.emit('joinRoom', { chatRoomId });
+            socket.emit('joinRoom', { chatRoomId }, (ack) => {
+                if (ack?.success) {
+                    addMessage(`Joined room ${chatRoomId}`, 'system');
+                    markRead();
+                    return;
+                }
+
+                addMessage(`Failed to join room ${chatRoomId}`, 'error');
+            });
             addMessage(`Joining room ${chatRoomId}...`, 'system');
+        }
+
+        function markRead() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+
+            if (!chatRoomId || !socket) {
+                addMessage('Please enter room ID and connect first', 'error');
+                return;
+            }
+
+            socket.emit('markRead', { chatRoomId });
+            addMessage(`Marking messages read in room ${chatRoomId}...`, 'system');
         }
         
         function leaveRoom() {
@@ -160,7 +236,86 @@
             });
             
             document.getElementById('message').value = '';
-            addMessage(`You: ${message}`, 'user');
+        }
+        
+        function sendTyping() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            
+            if (!chatRoomId || !socket) {
+                addMessage('Please enter room ID and connect first', 'error');
+                return;
+            }
+            
+            socket.emit('typing', {
+                chatRoomId: chatRoomId,
+                userId: currentUserId
+            });
+        }
+        
+        function sendStopTyping() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            
+            if (!chatRoomId || !socket) {
+                addMessage('Please enter room ID and connect first', 'error');
+                return;
+            }
+            
+            socket.emit('stopTyping', {
+                chatRoomId: chatRoomId,
+                userId: currentUserId
+            });
+        }
+        
+        function registerUser() {
+            if (!socket || !currentUserId) {
+                addMessage('Please connect first', 'error');
+                return;
+            }
+            
+            socket.emit('register', {
+                userId: currentUserId
+            }, (response) => {
+                if (response?.success) {
+                    addMessage(`Registered as user ${currentUserId}. Online users: ${response.onlineCount}`, 'system');
+                }
+            });
+        }
+        
+        function getOnlineUsers() {
+            if (!socket) {
+                addMessage('Please connect first', 'error');
+                return;
+            }
+            
+            socket.emit('getOnlineUsers', (response) => {
+                if (response) {
+                    addMessage(`Online users: ${response.onlineUsers.join(', ')} (Total: ${response.count})`, 'system');
+                }
+            });
+        }
+        
+        function getUnreadCount() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            
+            if (!chatRoomId) {
+                addMessage('Please enter room ID', 'error');
+                return;
+            }
+            
+            // This would be an HTTP API call in a real app
+            addMessage(`Unread count API: GET /chat-rooms/${chatRoomId}/unread-count`, 'system');
+        }
+        
+        function testPagination() {
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            
+            if (!chatRoomId) {
+                addMessage('Please enter room ID', 'error');
+                return;
+            }
+            
+            // This would be an HTTP API call in a real app
+            addMessage(`Pagination API: GET /chat-rooms/${chatRoomId}/messages?page=1&limit=5`, 'system');
         }
         
         // Enter key to send message

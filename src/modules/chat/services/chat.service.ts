@@ -34,8 +34,16 @@ export class ChatService {
     return this.messageService.createMessage(chatRoom.id, sender.id, message);
   }
 
-  async getMessages(chatRoomId: number) {
-    return this.messageService.getMessages(chatRoomId);
+  async getUserChats(userId: number) {
+    return this.chatRoomRepo.getUserChats(userId);
+  }
+
+  async getUnreadCount(chatRoomId: number, userId: number) {
+    return this.messageService.getUnreadCount(chatRoomId, userId);
+  }
+
+  async getMessages(chatRoomId: number, page = 1, limit = 20) {
+    return this.messageService.getMessages(chatRoomId, page, limit);
   }
 
   async findById(id: number) {

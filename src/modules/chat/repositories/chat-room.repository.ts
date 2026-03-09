@@ -26,4 +26,15 @@ export class ChatRoomRepository {
   findById(id: number) {
     return this.repo.findOne({ where: { id } });
   }
+
+  async getUserChats(userId: number) {
+    return this.repo
+      .createQueryBuilder("chat")
+      .leftJoin("chat.match", "match")
+      .leftJoin("match.user1", "user1")
+      .leftJoin("match.user2", "user2")
+      .where("user1.id = :userId OR user2.id = :userId", { userId })
+      .orderBy("chat.createdAt", "DESC")
+      .getMany();
+  }
 }
