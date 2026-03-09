@@ -1,0 +1,9 @@
+# Email Configuration - Ethereal Testing
+SMTP_HOST=smtp.ethereal.email
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=uzr247c2vaujjg52@ethereal.email
+SMTP_PASS=BAu4PgfgQSspq6b7Yd
+APP_NAME=DevDating
+FRONTEND_URL=https://localhost:3000
+SUPPORT_EMAIL=support@devdating.com

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Account Deletion Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .button {
+            display: inline-block;
+            background: #f5576c;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Confirm Account Deletion</h1>
+    </div>
+    <div class="content">
+        <p>Hi {{name}},</p>
+        <p>We received a request to delete your {{appName}} account. This action cannot be undone.</p>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> Deleting your account will permanently remove:
+            <ul>
+                <li>Your profile and all personal information</li>
+                <li>Your matches and conversations</li>
+                <li>Your photos and preferences</li>
+                <li>All account history and data</li>
+            </ul>
+        </div>
+        
+        <p>If you're sure you want to proceed, click the button below:</p>
+        <div style="text-align: center;">
+            <a href="{{deletionUrl}}" class="button">Delete My Account</a>
+        </div>
+        
+        <p>Or copy and paste this link into your browser:</p>
+        <p style="word-break: break-all; background: #eee; padding: 10px; border-radius: 5px;">{{deletionUrl}}</p>
+        
+        <p><strong>Note:</strong> This link will expire in 24 hours for security reasons.</p>
+        <p>If you didn't request to delete your account, please contact us immediately at {{supportEmail}}.</p>
+    </div>
+    <div class="footer">
+        <p>© 2024 {{appName}}. All rights reserved.</p>
+        <p>Need help? Contact us at {{supportEmail}}</p>
+    </div>
+</body>
+</html>

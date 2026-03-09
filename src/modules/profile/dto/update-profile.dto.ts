@@ -4,8 +4,13 @@ import {
   IsArray,
   IsEnum,
   IsUrl,
+  IsNumber,
+  IsDate,
+  IsDecimal,
+  Min,
+  Max,
 } from 'class-validator';
-import { ExperienceLevel, Gender } from '../entities/profile.entity';
+import { ExperienceLevel, Gender, LookingFor } from '../entities/profile.entity';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -17,8 +22,44 @@ export class UpdateProfileDto {
   gender?: Gender;
 
   @IsOptional()
-  @IsString()
-  lookingFor?: string;
+  @IsEnum(LookingFor)
+  lookingFor?: LookingFor;
+
+  @IsOptional()
+  @IsDate()
+  dateOfBirth?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(18)
+  @Max(100)
+  age?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(18)
+  @Max(100)
+  minAge?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(18)
+  @Max(100)
+  maxAge?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(1000)
+  maxDistance?: number;
+
+  @IsOptional()
+  @IsDecimal()
+  latitude?: number;
+
+  @IsOptional()
+  @IsDecimal()
+  longitude?: number;
 
   @IsOptional()
   @IsArray()

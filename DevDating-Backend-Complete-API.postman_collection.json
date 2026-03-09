@@ -1,0 +1,532 @@
+{
+	"info": {
+		"_postman_id": "dev-dating-backend-complete",
+		"name": "DevDating Backend - Complete API Collection",
+		"description": "Complete API collection for DevDating backend with authentication, profiles, chat, recommendations, and account management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"t12@devdating.com\",\n  \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login to get JWT token for authentication"
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"newuser@devdating.com\",\n  \"password\": \"123456\",\n  \"name\": \"New User\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new user account"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👤 Profile Management",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/profile/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["profile", "me"]
+						},
+						"description": "Get current user's profile information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bio\": \"Full-stack developer passionate about building amazing apps!\",\n  \"age\": 28,\n  \"minAge\": 25,\n  \"maxAge\": 35,\n  \"maxDistance\": 50,\n  \"location\": \"San Francisco, CA\",\n  \"gender\": \"male\",\n  \"lookingFor\": \"female\",\n  \"techStack\": [\"JavaScript\", \"TypeScript\", \"React\", \"Node.js\"],\n  \"experienceLevel\": \"senior\",\n  \"githubUrl\": \"https://github.com/example\",\n  \"linkedinUrl\": \"https://linkedin.com/in/example\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["profile", "me"]
+						},
+						"description": "Update current user's profile information"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Profile Photo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile/upload-photo",
+							"host": ["{{baseUrl}}"],
+							"path": ["profile", "upload-photo"]
+						},
+						"description": "Upload a profile photo (JPEG, PNG, GIF, WebP, max 5MB)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💬 Chat System",
+			"item": [
+				{
+					"name": "Get My Chats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/chat-rooms/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["chat-rooms", "my"]
+						},
+						"description": "Get all chat rooms for the current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Chat Messages",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/chat-rooms/{{chatRoomId}}/messages?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["chat-rooms", "{{chatRoomId}}", "messages"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get messages from a specific chat room with pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Hello! This is a test message.\",\n  \"chatRoomId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat-rooms/send-message",
+							"host": ["{{baseUrl}}"],
+							"path": ["chat-rooms", "send-message"]
+						},
+						"description": "Send a message to a chat room"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/chat-rooms/{{chatRoomId}}/unread-count",
+							"host": ["{{baseUrl}}"],
+							"path": ["chat-rooms", "{{chatRoomId}}", "unread-count"]
+						},
+						"description": "Get unread message count for a chat room"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔥 Recommendation Feed",
+			"item": [
+				{
+					"name": "Get User Feed",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/feed?page=1&limit=20&minAge=25&maxAge=35&maxDistance=50",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "feed"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "minAge",
+									"value": "25"
+								},
+								{
+									"key": "maxAge",
+									"value": "35"
+								},
+								{
+									"key": "maxDistance",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Get personalized recommendation feed with filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Feed Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/feed/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "feed", "stats"]
+						},
+						"description": "Get statistics about the recommendation feed"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "⚙️ Account Management",
+			"item": [
+				{
+					"name": "Send Email Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/account/send-verification",
+							"host": ["{{baseUrl}}"],
+							"path": ["account", "send-verification"]
+						},
+						"description": "Send email verification link to user's email"
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/account/verify-email/{{verificationToken}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["account", "verify-email", "{{verificationToken}}"]
+						},
+						"description": "Verify email using verification token"
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/account/deactivate",
+							"host": ["{{baseUrl}}"],
+							"path": ["account", "deactivate"]
+						},
+						"description": "Deactivate user account (can be reactivated within 6 months)"
+					},
+					"response": []
+				},
+				{
+					"name": "Reactivate Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/account/reactivate",
+							"host": ["{{baseUrl}}"],
+							"path": ["account", "reactivate"]
+						},
+						"description": "Reactivate a deactivated account"
+					},
+					"response": []
+				},
+				{
+					"name": "Request Account Deletion",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/account/request-deletion",
+							"host": ["{{baseUrl}}"],
+							"path": ["account", "request-deletion"]
+						},
+						"description": "Request account deletion (requires email confirmation)"
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Account Deletion",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/account/confirm-deletion/{{deletionToken}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["account", "confirm-deletion", "{{deletionToken}}"]
+						},
+						"description": "Confirm account deletion using email token"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💝 Matching System",
+			"item": [
+				{
+					"name": "Create Match",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"targetUserId\": 8\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/matches",
+							"host": ["{{baseUrl}}"],
+							"path": ["matches"]
+						},
+						"description": "Create a match with another user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Matches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/matches/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["matches", "my"]
+						},
+						"description": "Get all matches for the current user"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "chatRoomId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "verificationToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "deletionToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
