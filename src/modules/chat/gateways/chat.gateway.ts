@@ -12,6 +12,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { MessageService } from '../../message/services/message.service';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../../users/services/users.service';
 
 @WebSocketGateway({
   cors: {
@@ -20,6 +21,10 @@ import { JwtService } from '@nestjs/jwt';
       'http://127.0.0.1:3000',
       'https://localhost:3000',
       'https://127.0.0.1:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3001',
+      'https://localhost:3001',
+      'https://127.0.0.1:3001',
       'http://localhost:8081',
       'http://127.0.0.1:8081',
       'https://localhost:8081',
@@ -39,6 +44,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   constructor(
     private readonly messageService: MessageService,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
   afterInit(server: Server) {
@@ -213,13 +219,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         content: data.content,
       });
 
+      // Get sender info
+      const sender = await this.usersService.findById(userId);
+
       // Emit message to room with sender info
       this.server
         .to(`room-${data.chatRoomId}`)
         .emit('newMessage', {
-          ...savedMessage,
+          id: savedMessage.id,
           senderId: userId,
-          timestamp: new Date(),
+          senderName: sender?.name || 'Unknown',
+          content: savedMessage.content,
+          createdAt: savedMessage.createdAt,
         });
 
       return {

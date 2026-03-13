@@ -46,6 +46,7 @@ export class ProfileService {
     profile.isComplete = Boolean(
       profile.bio &&
       profile.gender &&
+      profile.photoUrl &&
       profile.techStack?.length &&
       profile.experienceLevel &&
       profile.location
@@ -60,6 +61,24 @@ export class ProfileService {
     });
 
     return !!profile && profile.isComplete === true;
+  }
+
+  // 🔹 CREATE PROFILE (used by scripts)
+  async create(userId: number, data: Partial<Profile>) {
+    const user = await this.usersService.findById(userId);
+    const profile = this.profileRepo.create({
+      user,
+      ...data,
+      isComplete: Boolean(
+        data.bio &&
+        data.gender &&
+        data.photoUrl &&
+        data.techStack?.length &&
+        data.experienceLevel &&
+        data.location
+      ),
+    });
+    return this.profileRepo.save(profile);
   }
 
 }

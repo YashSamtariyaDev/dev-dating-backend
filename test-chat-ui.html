@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Chat UI</title>
+    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .status { padding: 10px; margin-bottom: 20px; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .messages { height: 400px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; background: #fafafa; }
+        .message { margin: 10px 0; padding: 10px; border-radius: 15px; max-width: 80%; }
+        .own { background: #007bff; color: white; margin-left: auto; text-align: right; }
+        .other { background: #e9ecef; color: #333; }
+        .sender { font-size: 0.8em; font-weight: bold; margin-bottom: 5px; }
+        .time { font-size: 0.7em; opacity: 0.7; margin-top: 5px; }
+        .input-group { display: flex; gap: 10px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 20px; cursor: pointer; }
+        button:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💬 Test Chat UI</h1>
+        
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <div class="input-group">
+            <input type="text" id="token" placeholder="JWT Token" style="flex: 2;">
+            <input type="number" id="chatRoomId" placeholder="Room ID" value="5">
+            <button onclick="connect()">Connect</button>
+        </div>
+        
+        <div id="messages" class="messages"></div>
+        
+        <div class="input-group">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') send()">
+            <button onclick="send()" id="sendBtn" disabled>Send</button>
+        </div>
+    </div>
+    
+    <script>
+        let socket;
+        let currentUserId = null;
+        
+        function updateStatus(connected) {
+            const status = document.getElementById('status');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            if (connected) {
+                status.className = 'status connected';
+                status.textContent = '✅ Connected';
+                sendBtn.disabled = false;
+            } else {
+                status.className = 'status disconnected';
+                status.textContent = '❌ Disconnected';
+                sendBtn.disabled = true;
+            }
+        }
+        
+        function addMessage(message, isOwn = false, senderName = null) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message ${isOwn ? 'own' : 'other'}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            let html = '';
+            if (!isOwn && senderName) {
+                html += `<div class="sender">${senderName}</div>`;
+            }
+            html += `<div>${message}</div>`;
+            html += `<div class="time">${time}</div>`;
+            
+            div.innerHTML = html;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function connect() {
+            const token = document.getElementById('token').value.trim();
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            
+            if (!token || !chatRoomId) {
+                alert('Please enter token and room ID');
+                return;
+            }
+            
+            // Parse JWT to get user ID
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                currentUserId = Number(payload.sub);
+            } catch (e) {
+                alert('Invalid token');
+                return;
+            }
+            
+            addMessage(`Connecting to room ${chatRoomId}...`, false, 'System');
+            
+            socket = io('https://localhost:3000', {
+                auth: { token },
+                transports: ['websocket'],
+                rejectUnauthorized: false,
+            });
+            
+            socket.on('connect', () => {
+                updateStatus(true);
+                addMessage('Connected to chat server', false, 'System');
+                
+                // Register and join room
+                socket.emit('register', { userId: currentUserId });
+                socket.emit('joinRoom', { chatRoomId });
+            });
+            
+            socket.on('disconnect', () => {
+                updateStatus(false);
+                addMessage('Disconnected from chat server', false, 'System');
+            });
+            
+            socket.on('newMessage', (data) => {
+                const isOwn = data.senderId === currentUserId;
+                const senderName = isOwn ? 'You' : (data.senderName || `User ${data.senderId}`);
+                addMessage(data.content, isOwn, senderName);
+            });
+            
+            socket.on('connect_error', (error) => {
+                updateStatus(false);
+                addMessage(`Connection error: ${error.message}`, false, 'System');
+            });
+        }
+        
+        function send() {
+            const input = document.getElementById('messageInput');
+            const chatRoomId = parseInt(document.getElementById('chatRoomId').value);
+            const message = input.value.trim();
+            
+            if (!message || !socket || !socket.connected) return;
+            
+            socket.emit('sendMessage', {
+                chatRoomId: chatRoomId,
+                content: message
+            });
+            
+            input.value = '';
+        }
+    </script>
+</body>
+</html>

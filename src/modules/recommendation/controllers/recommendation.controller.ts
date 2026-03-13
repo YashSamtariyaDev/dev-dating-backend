@@ -1,6 +1,7 @@
 import { Controller, Get, Query, UseGuards, Req } from '@nestjs/common';
 import { RecommendationService, FeedOptions } from '../services/recommendation.service';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { FeedUserDto } from '../../users/dto/user-feed.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -30,7 +31,7 @@ export class RecommendationController {
     
     return {
       success: true,
-      data: feed,
+      data: feed.map(u => this.mapToFeedDto(u)),
       pagination: {
         page: options.page || 1,
         limit: options.limit || 20,
@@ -66,6 +67,21 @@ export class RecommendationController {
     return {
       success: true,
       data: stats,
+    };
+  }
+
+  private mapToFeedDto(user: any): FeedUserDto {
+    return {
+      id: user.id,
+      name: user.name,
+      bio: user.bio,
+      age: user.age,
+      gender: user.gender,
+      techStack: user.techStack,
+      experienceLevel: user.experienceLevel,
+      location: user.location,
+      distance: user.distance,
+      matchScore: user.matchScore,
     };
   }
 }

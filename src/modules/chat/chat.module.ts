@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { StringValue } from 'ms';
 
 import { ChatRoom } from './entities/chat-room.entity';
+import { Match } from '../matching/entities/match.entity';
 import { ChatRoomRepository } from './repositories/chat-room.repository';
 import { ChatService } from './services/chat.service';
 import { ChatController } from './controllers/chat.controller';
@@ -16,7 +17,7 @@ import { ChatGateway } from './gateways/chat.gateway';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ChatRoom]),
+    TypeOrmModule.forFeature([ChatRoom, Match]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

@@ -4,6 +4,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { json, urlencoded } from 'express';
 
 async function bootstrap() {
   const httpsEnabled = process.env.HTTPS === 'true';
@@ -22,8 +23,27 @@ async function bootstrap() {
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, httpsOptions ? { httpsOptions } : undefined);
 
-  // Serve static files from uploads directory
-  app.useStaticAssets(join(__dirname, '..', 'uploads'));
+  // Increase payload limit for large JSON/URL-encoded requests
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ limit: '10mb', extended: true }));
+
+  // Diagnostic middleware
+  app.use((req, res, next) => {
+    if (req.url.includes('upload-photo') || (req.method === 'PATCH' && req.url.includes('profile/me'))) {
+      console.log(`📥 Backend Received: ${req.method} ${req.url}`);
+      console.log(`📥 Content-Type: ${req.headers['content-type']}`);
+      console.log(`📥 Authorization: ${req.headers.authorization ? 'Present' : 'Missing'}`);
+      if (req.headers.authorization) {
+         console.log(`📥 Token snippet: ${req.headers.authorization.substring(0, 25)}...`);
+      }
+    }
+    next();
+  });
+
+  // Serve static files from uploads directory with /uploads prefix
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -34,9 +54,10 @@ async function bootstrap() {
   );
 
   const port = process.env.PORT ?? (httpsEnabled ? 443 : 3000);
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   const protocol = httpsOptions ? 'https' : 'http';
-  Logger.log(`🚀 Application is running on: ${protocol}://localhost:${port}`, 'Bootstrap');
+  const host = '192.168.1.35'; // Local IP
+  Logger.log(`🚀 Application is running on: ${protocol}://${host}:${port}`, 'Bootstrap');
 }
 bootstrap();

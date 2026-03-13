@@ -22,19 +22,25 @@ export class UsersService {
 
   ) {}
 
-  // 🔹 Create User
-  async createUser(data: { email: string; password: string; name: string }): Promise<User> {
-  const hashedPassword = await bcrypt.hash(data.password, 12);
+  // 🔹 Generic create (used by scripts)
+  async createUser(data: { email: string; password: string; name: string; role?: UserRole }): Promise<User> {
+    const hashedPassword = await bcrypt.hash(data.password, 12);
 
-  const user = this.userRepository.create({
-    email: data.email,
-    password: hashedPassword,
-    name: data.name,
-    role: UserRole.USER,
-  });
+    const user = this.userRepository.create({
+      email: data.email,
+      password: hashedPassword,
+      name: data.name,
+      role: data.role ?? UserRole.USER,
+      isEmailVerified: false, // Default to false, will be set to true after OTP verification
+    });
 
-  return this.userRepository.save(user);
-}
+    return this.userRepository.save(user);
+  }
+
+  // 🔹 Update Email Verification Status
+  async updateEmailVerification(userId: number, isVerified: boolean): Promise<void> {
+    await this.userRepository.update(userId, { isEmailVerified: isVerified });
+  }
 
 
   // 🔹 Find by Email (used by Auth)
@@ -57,9 +63,16 @@ export class UsersService {
     return user;
   }
 
-  // 🔹 Find All Users (for admin)
+  // 🔹 Find all (admin)
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.userRepository.find({
+      relations: ['profile'],
+    });
+  }
+
+  // 🔹 Delete user by ID (for scripts)
+  async deleteById(id: number) {
+    return this.userRepository.delete(id);
   }
 
   // 🔹 Validate Password

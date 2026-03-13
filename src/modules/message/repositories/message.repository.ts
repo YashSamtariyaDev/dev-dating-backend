@@ -14,6 +14,7 @@ export class MessageRepository {
     return this.messageRepo.find({
       where: { chatRoomId },
       order: { createdAt: 'ASC' },
+      relations: ['sender'],
     });
   }
 
@@ -23,6 +24,7 @@ export class MessageRepository {
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
+      relations: ['sender'],
     });
   }
 
@@ -49,12 +51,9 @@ export class MessageRepository {
     await this.messageRepo
       .createQueryBuilder()
       .update(Message)
-      .set({
-        status: MessageStatus.DELIVERED,
-        deliveredAt: () => 'CURRENT_TIMESTAMP',
-      })
-      .where('chat_room_id = :chatRoomId', { chatRoomId })
-      .andWhere('sender_id != :userId', { userId })
+      .set({ status: MessageStatus.DELIVERED })
+      .where('chatRoomId = :chatRoomId', { chatRoomId })
+      .andWhere('senderId != :userId', { userId })
       .andWhere('status = :status', { status: MessageStatus.SENT })
       .execute();
   }
@@ -63,13 +62,10 @@ export class MessageRepository {
     await this.messageRepo
       .createQueryBuilder()
       .update(Message)
-      .set({
-        status: MessageStatus.READ,
-        readAt: () => 'CURRENT_TIMESTAMP',
-      })
-      .where('chat_room_id = :chatRoomId', { chatRoomId })
-      .andWhere('sender_id != :userId', { userId })
-      .andWhere('status != :status', { status: MessageStatus.READ })
+      .set({ status: MessageStatus.READ })
+      .where('chatRoomId = :chatRoomId', { chatRoomId })
+      .andWhere('senderId != :userId', { userId })
+      .andWhere('status = :status', { status: MessageStatus.DELIVERED })
       .execute();
   }
 }

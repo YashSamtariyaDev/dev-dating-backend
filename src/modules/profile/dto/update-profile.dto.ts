@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsDate,
   IsDecimal,
+  IsBoolean,
   Min,
   Max,
 } from 'class-validator';
@@ -80,4 +81,20 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   location?: string;
+
+  @IsOptional()
+  @IsString()
+  photoUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  githubUsername?: string;
+
+  @IsOptional()
+  @IsString()
+  portfolioUrl?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isAvailable?: boolean;
 }

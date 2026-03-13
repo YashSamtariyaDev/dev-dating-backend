@@ -3,7 +3,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 export enum MessageStatus {
   SENT = 'sent',
@@ -21,6 +24,10 @@ export class Message {
 
   @Column({ name: 'sender_id' })
   senderId: number;
+
+  @ManyToOne(() => User, { eager: true })
+  @JoinColumn({ name: 'sender_id' })
+  sender: User;
 
   @Column({ name: 'message' })
   content: string;

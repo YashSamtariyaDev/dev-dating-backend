@@ -12,8 +12,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileService } from '../services/profile.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { FileUploadService } from '../../upload/file-upload.service';
 
 @Controller('profile')
@@ -35,6 +35,20 @@ export class ProfileController {
     @Body() dto: UpdateProfileDto,
   ) {
     return this.profileService.updateProfile(Number(user.userId), dto);
+  }
+
+  @Get('completion-status')
+  async getCompletionStatus(@CurrentUser() user) {
+    const profile = await this.profileService.getOrCreateProfile(Number(user.userId));
+    
+    const required = ['bio', 'techStack', 'experienceLevel', 'location', 'gender', 'photoUrl'];
+    const missing = required.filter(field => !profile[field]);
+
+    return {
+      isComplete: profile.isComplete,
+      missing,
+      completionPercentage: Math.round(((required.length - missing.length) / required.length) * 100),
+    };
   }
 
   @Post('upload-photo')

@@ -11,6 +11,7 @@ import { Swipe, SwipeType } from '../entities/swipe.entity';
 import { UsersService } from '../../users/services/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MatchCreatedEvent } from '../events/match-created.event';
+import { MatchDto, SwipeResponseDto } from '../dto/match.dto';
 
 @Injectable()
 export class MatchingService {
@@ -41,7 +42,7 @@ export class MatchingService {
 
     const target = await this.usersService.findById(dto.targetId);
     if (!target) {
-    throw new BadRequestException('Target user not found');
+      throw new BadRequestException('Target user not found');
     }
 
     const existingSwipe = await this.swipeRepo.findOne({
@@ -56,7 +57,9 @@ export class MatchingService {
       throw new BadRequestException('You already swiped this user');
     }
 
-    return this.dataSource.transaction(async (manager) => {
+    let matchResult: any = null;
+
+    await this.dataSource.transaction(async (manager) => {
       const swipe = manager.create(Swipe, {
         swiper,
         target,
@@ -87,24 +90,41 @@ export class MatchingService {
 
           const savedMatch = await manager.save(match);
 
-          this.eventEmitter.emit(
-            'match.created',
-            new MatchCreatedEvent(
-              savedMatch.id,
-              swiper.id,
-              target.id,
-            ),
-          );
-
-          return {
-            message: 'It’s a match!',
-            match,
+          // Prepare match data to emit after transaction
+          matchResult = {
+            matchId: savedMatch.id,
+            user1Id: swiper.id,
+            user2Id: target.id,
+            response: {
+              message: 'It’s a match!',
+              match: {
+                id: match.id,
+                matchedAt: match.matchedAt.toISOString(),
+                user: {
+                  id: target.id,
+                  name: target.name,
+                },
+              },
+            },
           };
         }
       }
-
-      return { message: 'Swipe recorded' };
     });
+
+    // Emit event after transaction is committed
+    if (matchResult) {
+      this.eventEmitter.emit(
+        'match.created',
+        new MatchCreatedEvent(
+          matchResult.matchId,
+          matchResult.user1Id,
+          matchResult.user2Id,
+        ),
+      );
+      return matchResult.response;
+    }
+
+    return { message: 'Swipe recorded' };
   }
 
   async getUserMatches(userId: number) {
@@ -117,7 +137,7 @@ export class MatchingService {
       order: { matchedAt: 'DESC' },
     });
 
-    // Return only the other user
+    // Return only the other user with minimal fields
     return matches.map(match => {
       const otherUser =
         match?.user1.id === userId ? match.user2 : match.user1;
@@ -127,7 +147,6 @@ export class MatchingService {
         matchedAt: match.matchedAt,
         user: {
           id: otherUser.id,
-          email: otherUser.email,
           name: otherUser.name,
         },
       };

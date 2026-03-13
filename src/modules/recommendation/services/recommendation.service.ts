@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Profile } from '../../profile/entities/profile.entity';
 import { Gender, LookingFor } from '../../profile/entities/profile.entity';
+import { MatchingService } from '../../matching/services/matching.service';
 
 export interface FeedUser {
   id: number;
@@ -33,6 +34,7 @@ export class RecommendationService {
     private readonly profileRepo: Repository<Profile>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    private readonly matchingService: MatchingService,
   ) {}
 
   async getUserFeed(userId: number, options: FeedOptions = {}): Promise<FeedUser[]> {
@@ -54,11 +56,21 @@ export class RecommendationService {
       throw new Error('User profile not found');
     }
 
+    // Block feed if profile is not complete
+    if (!currentUserProfile.isComplete) {
+      throw new Error('Please complete your profile to start connecting with others');
+    }
+
+    // Get IDs of users already swiped
+    const swipedUserIds = await this.matchingService.getSwipedUserIds(userId);
+    const matchedUserIds = await this.matchingService.getMatchedUserIds(userId);
+    const excludedIds = [userId, ...swipedUserIds, ...matchedUserIds];
+
     // Build base query
     const queryBuilder = this.profileRepo
       .createQueryBuilder('profile')
       .leftJoinAndSelect('profile.user', 'user')
-      .where('user.id != :userId', { userId }) // Exclude self
+      .where('user.id NOT IN (:...excludedIds)', { excludedIds }) // Exclude self and swiped/matched
       .andWhere('user.isActive = :isActive', { isActive: true }) // Only active users
       .andWhere('profile.isComplete = :isComplete', { isComplete: true }); // Only complete profiles
 

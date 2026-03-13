@@ -4,9 +4,12 @@ import { RecommendationController } from './controllers/recommendation.controlle
 import { RecommendationService } from './services/recommendation.service';
 import { User } from '../users/entities/user.entity';
 import { Profile } from '../profile/entities/profile.entity';
+import { MatchingModule } from '../matching/matching.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
+    MatchingModule,
   ],
   controllers: [RecommendationController],
   providers: [RecommendationService],

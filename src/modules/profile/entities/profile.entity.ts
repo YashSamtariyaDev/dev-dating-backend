@@ -81,6 +81,18 @@ export class Profile {
   @Column({ nullable: true })
   location: string;
 
+  @Column({ nullable: true })
+  githubUsername: string;
+
+  @Column({ nullable: true })
+  portfolioUrl: string;
+
+  @Column({ nullable: true })
+  photoUrl: string;
+
+  @Column({ default: false })
+  isAvailable: boolean;
+
   @Column({ default: false })
   isComplete: boolean;
 

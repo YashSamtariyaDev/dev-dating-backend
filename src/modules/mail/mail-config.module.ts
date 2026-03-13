@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ConfigService } from '@nestjs/config';
+import { existsSync } from 'fs';
 import { join } from 'path';
 
 @Module({
@@ -22,7 +23,11 @@ import { join } from 'path';
           from: `"${configService.get<string>('APP_NAME') || 'DevDating'}" <${configService.get<string>('SMTP_FROM') || 'noreply@devdating.com'}>`,
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          dir: (() => {
+            const distTemplatesDir = join(__dirname, 'templates');
+            if (existsSync(distTemplatesDir)) return distTemplatesDir;
+            return join(process.cwd(), 'src', 'modules', 'mail', 'templates');
+          })(),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

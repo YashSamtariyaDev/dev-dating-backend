@@ -24,6 +24,8 @@ export class EmailService {
     if (smtpUser && smtpHost) {
       try {
         console.log('📤 Sending email via SMTP...');
+        
+        // Use template system properly
         await this.mailerService.sendMail({
           to: email,
           subject: 'Verify Your Email Address',
@@ -49,8 +51,18 @@ export class EmailService {
   async sendAccountDeactivationConfirmation(email: string, name: string) {
     console.log(`📧 Account Deactivated - To: ${email}, Name: ${name}`);
     
-    if (this.configService.get<string>('SMTP_USER')) {
+    const smtpUser = this.configService.get<string>('SMTP_USER');
+    const smtpHost = this.configService.get<string>('SMTP_HOST');
+    
+    console.log(`🔧 SMTP Config - Host: ${smtpHost}, User: ${smtpUser}`);
+    
+    if (smtpUser && smtpHost) {
       try {
+        console.log('📤 Sending deactivation email via SMTP...');
+        
+        const reactivationUrl = `${this.configService.get<string>('FRONTEND_URL') || 'https://localhost:3000'}/reactivate`;
+        
+        // Use template system properly
         await this.mailerService.sendMail({
           to: email,
           subject: 'Account Deactivated',
@@ -59,12 +71,17 @@ export class EmailService {
             name,
             appName: this.configService.get<string>('APP_NAME') || 'DevDating',
             supportEmail: this.configService.get<string>('SUPPORT_EMAIL') || 'support@devdating.com',
-            reactivationUrl: `${this.configService.get<string>('FRONTEND_URL') || 'https://localhost:3000'}/reactivate`,
+            reactivationUrl,
           },
         });
+        console.log('✅ Account deactivation email sent successfully!');
       } catch (error) {
-        console.log('⚠️ Email sending failed (SMTP not configured):', error.message);
+        console.log('❌ Email sending failed:', error.message);
+        console.log('� Full error:', error);
       }
+    } else {
+      console.log('⚠️ SMTP not configured - Email not sent');
+      console.log('📋 Required env vars: SMTP_HOST, SMTP_USER, SMTP_PASS');
     }
   }
 
@@ -114,28 +131,39 @@ export class EmailService {
     }
   }
 
-  async sendPasswordResetEmail(email: string, resetToken: string) {
-    const resetUrl = `${this.configService.get<string>('FRONTEND_URL') || 'https://localhost:3000'}/reset-password?token=${resetToken}`;
+  async sendEmailVerificationOTP(email: string, otp: string, name: string) {
+    console.log(`📧 Email Verification OTP - To: ${email}, OTP: ${otp}`);
     
-    console.log(`📧 Password Reset - To: ${email}`);
-    console.log(`📧 Reset URL: ${resetUrl}`);
+    // Check if SMTP is configured
+    const smtpUser = this.configService.get<string>('SMTP_USER');
+    const smtpHost = this.configService.get<string>('SMTP_HOST');
     
-    if (this.configService.get<string>('SMTP_USER')) {
+    console.log(`� SMTP Config - Host: ${smtpHost}, User: ${smtpUser}`);
+    
+    if (smtpUser && smtpHost) {
       try {
+        console.log('📤 Sending OTP email via SMTP...');
+        
+        // Use template system properly
         await this.mailerService.sendMail({
           to: email,
-          subject: 'Reset Your Password',
-          template: 'password-reset',
+          subject: '🔐 Verify Your Email - DevDating OTP',
+          template: 'email-verification-otp',
           context: {
-            name: email.split('@')[0],
-            resetUrl,
+            name: name || email.split('@')[0],
+            otp,
             appName: this.configService.get<string>('APP_NAME') || 'DevDating',
             supportEmail: this.configService.get<string>('SUPPORT_EMAIL') || 'support@devdating.com',
           },
         });
+        console.log('✅ OTP email sent successfully!');
       } catch (error) {
-        console.log('⚠️ Email sending failed (SMTP not configured):', error.message);
+        console.log('❌ OTP email sending failed:', error.message);
+        console.log('🔧 Full error:', error);
       }
+    } else {
+      console.log('⚠️ SMTP not configured - OTP email not sent');
+      console.log('📋 Required env vars: SMTP_HOST, SMTP_USER, SMTP_PASS');
     }
   }
 }
