@@ -42,10 +42,15 @@ export class ProfileController {
     const profile = await this.profileService.getOrCreateProfile(Number(user.userId));
     
     const required = ['bio', 'techStack', 'experienceLevel', 'location', 'gender', 'photoUrl'];
-    const missing = required.filter(field => !profile[field]);
+    const missing = required.filter(field => {
+      const val = profile[field];
+      if (field === 'techStack') return !val || val.length === 0;
+      if (typeof val === 'string') return val.trim() === '';
+      return !val;
+    });
 
     return {
-      isComplete: profile.isComplete,
+      isComplete: missing.length === 0,
       missing,
       completionPercentage: Math.round(((required.length - missing.length) / required.length) * 100),
     };

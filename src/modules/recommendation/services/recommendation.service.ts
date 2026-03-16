@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
@@ -35,7 +35,7 @@ export class RecommendationService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     private readonly matchingService: MatchingService,
-  ) {}
+  ) { }
 
   async getUserFeed(userId: number, options: FeedOptions = {}): Promise<FeedUser[]> {
     const {
@@ -56,9 +56,18 @@ export class RecommendationService {
       throw new Error('User profile not found');
     }
 
-    // Block feed if profile is not complete
-    if (!currentUserProfile.isComplete) {
-      throw new Error('Please complete your profile to start connecting with others');
+    // Block feed if profile is not complete (dynamic check)
+    const isComplete = Boolean(
+      currentUserProfile.bio &&
+      currentUserProfile.gender &&
+      currentUserProfile.photoUrl &&
+      currentUserProfile.techStack?.length > 0 &&
+      currentUserProfile.experienceLevel &&
+      currentUserProfile.location?.trim() !== ''
+    );
+
+    if (!isComplete) {
+      throw new ForbiddenException('Please complete your profile to start connecting with others');
     }
 
     // Get IDs of users already swiped
@@ -184,7 +193,7 @@ export class RecommendationService {
     const R = 6371; // Earth's radius in kilometers
     const dLat = this.toRadians(lat2 - lat1);
     const dLng = this.toRadians(lng2 - lng1);
-    const a = 
+    const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
       Math.sin(dLng / 2) * Math.sin(dLng / 2);
@@ -232,7 +241,7 @@ export class RecommendationService {
         candidateProfile.latitude,
         candidateProfile.longitude
       ) || 0;
-      
+
       if (distance < 10) score += 25; // Same city
       else if (distance < 50) score += 15; // Nearby
       else if (distance < 200) score += 5; // Same region

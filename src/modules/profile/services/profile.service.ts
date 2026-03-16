@@ -47,10 +47,11 @@ export class ProfileService {
       profile.bio &&
       profile.gender &&
       profile.photoUrl &&
-      profile.techStack?.length &&
+      profile.techStack && profile.techStack.length > 0 &&
       profile.experienceLevel &&
-      profile.location
+      profile.location && profile.location.trim() !== ''
     );
+
 
     return this.profileRepo.save(profile);
   }
@@ -73,10 +74,11 @@ export class ProfileService {
         data.bio &&
         data.gender &&
         data.photoUrl &&
-        data.techStack?.length &&
+        data.techStack && data.techStack.length > 0 &&
         data.experienceLevel &&
-        data.location
+        data.location && data.location.trim() !== ''
       ),
+
     });
     return this.profileRepo.save(profile);
   }
