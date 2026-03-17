@@ -10,6 +10,7 @@ async function bootstrap() {
   // 🔍 Debug logging for Railway deployment
   console.log('🔍 Environment check starts...');
   console.log(`🔍 NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`🔍 Available Env Keys: ${Object.keys(process.env).join(', ')}`);
   console.log(`🔍 JWT_ACCESS_SECRET check: ${process.env.JWT_ACCESS_SECRET ? 'PRESENT (HIDDEN)' : 'MISSING'}`);
   if (process.env.JWT_ACCESS_SECRET) {
       console.log(`🔍 JWT_ACCESS_SECRET snippet: ${process.env.JWT_ACCESS_SECRET.substring(0, 3)}...`);

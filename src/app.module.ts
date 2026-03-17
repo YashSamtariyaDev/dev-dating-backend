@@ -19,8 +19,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'production' ? undefined : '.env',
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      envFilePath: '.env',
+      ignoreEnvFile: !require('fs').existsSync('.env') || process.env.NODE_ENV === 'production',
     }),
 
     EventEmitterModule.forRoot(),
