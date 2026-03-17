@@ -17,18 +17,18 @@ import { UsersService } from '../../users/services/users.service';
 @WebSocketGateway({
   cors: {
     origin: [
+      'http://localhost',
       'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'https://localhost:3000',
-      'https://127.0.0.1:3000',
       'http://localhost:3001',
+      'http://127.0.0.1',
+      'http://127.0.0.1:3000',
       'http://127.0.0.1:3001',
+      'http://192.168.1.35',
+      'http://192.168.1.35:3000',
+      'http://192.168.1.35:3001',
+      'https://localhost',
+      'https://localhost:3000',
       'https://localhost:3001',
-      'https://127.0.0.1:3001',
-      'http://localhost:8081',
-      'http://127.0.0.1:8081',
-      'https://localhost:8081',
-      'https://127.0.0.1:8081',
       'file://',
     ],
     credentials: true,
@@ -45,7 +45,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     private readonly messageService: MessageService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   afterInit(server: Server) {
     console.log('🔌 WebSocket Gateway initialized');
@@ -53,7 +53,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(client: Socket) {
     console.log('🔗 Client connected:', client.id);
-    
+
     // Extract token from handshake
     const token = client.handshake.auth.token;
     if (!token) {
@@ -74,7 +74,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   handleDisconnect(client: Socket) {
     console.log('🔌 Client disconnected:', client.id);
-    
+
     // Find and remove user from online users
     for (const [userId, socketId] of this.onlineUsers.entries()) {
       if (socketId === client.id) {
@@ -92,7 +92,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) {
     this.onlineUsers.set(data.userId, client.id);
     this.server.emit('userOnline', data.userId);
-    
+
     return {
       success: true,
       userId: data.userId,
@@ -206,7 +206,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @ConnectedSocket() client: Socket,
   ) {
     const userId = client.data.userId;
-    
+
     if (!userId) {
       return { error: 'Not authenticated' };
     }

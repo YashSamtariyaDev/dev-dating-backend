@@ -15,6 +15,7 @@ import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { FileUploadService } from '../../upload/file-upload.service';
+import { R2StorageService } from '../../upload/r2-storage.service';
 
 @Controller('profile')
 @UseGuards(JwtAuthGuard)
@@ -22,6 +23,7 @@ export class ProfileController {
   constructor(
     private readonly profileService: ProfileService,
     private readonly fileUploadService: FileUploadService,
+    private readonly r2StorageService: R2StorageService,
   ) {}
 
   @Get('me')
@@ -61,22 +63,22 @@ export class ProfileController {
   async uploadPhoto(
     @CurrentUser() user,
     @UploadedFile() file: Express.Multer.File,
-    @Req() req,
   ) {
     if (!file) {
       throw new Error('No file uploaded');
     }
 
-    const photoUrl = FileUploadService.getProfilePhotoUrl(file.filename);
+    // Upload to Cloudflare R2
+    const photoUrl = await this.r2StorageService.uploadFile(file);
     
-    // Update user profile with photo URL
+    // Update user profile with photo URL (which is now a full public R2 URL)
     await this.profileService.updateProfile(Number(user.userId), {
       photoUrl
     } as any);
 
     return {
       message: 'Photo uploaded successfully',
-      photoUrl: `${req.protocol}://${req.get('host')}${photoUrl}`
+      photoUrl
     };
   }
 }

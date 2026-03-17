@@ -1,21 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
 
 @Injectable()
 export class FileUploadService {
   static getMulterOptions() {
     return {
-      storage: diskStorage({
-        destination: './uploads/profile-photos',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'image/jpeg',
