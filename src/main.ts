@@ -7,6 +7,14 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { json, urlencoded } from 'express';
 
 async function bootstrap() {
+  // 🔍 Debug logging for Railway deployment
+  console.log('🔍 Environment check starts...');
+  console.log(`🔍 NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`🔍 JWT_ACCESS_SECRET check: ${process.env.JWT_ACCESS_SECRET ? 'PRESENT (HIDDEN)' : 'MISSING'}`);
+  if (process.env.JWT_ACCESS_SECRET) {
+      console.log(`🔍 JWT_ACCESS_SECRET snippet: ${process.env.JWT_ACCESS_SECRET.substring(0, 3)}...`);
+  }
+  
   const httpsEnabled = process.env.HTTPS === 'true';
   let httpsOptions;
 
