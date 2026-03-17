@@ -17,7 +17,13 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+
     EventEmitterModule.forRoot(),
+
     AuthModule,
     UsersModule,
     ProfileModule,
@@ -26,10 +32,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     RecommendationModule,
     MailModule,
     AccountModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-    }),
+
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: databaseConfig,
@@ -38,4 +41,4 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
