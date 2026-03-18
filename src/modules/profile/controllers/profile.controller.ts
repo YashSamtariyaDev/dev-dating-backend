@@ -41,7 +41,8 @@ export class ProfileController {
 
   @Get('completion-status')
   async getCompletionStatus(@CurrentUser() user) {
-    const profile = await this.profileService.getOrCreateProfile(Number(user.userId));
+    const userId = Number(user.userId);
+    const profile = await this.profileService.getOrCreateProfile(userId);
     
     const required = ['bio', 'techStack', 'experienceLevel', 'location', 'gender', 'photoUrl'];
     const missing = required.filter(field => {
@@ -51,8 +52,16 @@ export class ProfileController {
       return !val;
     });
 
+    const isCalculatedComplete = missing.length === 0;
+
+    // Self-healing: if database is incorrect, sync it
+    if (profile.isComplete !== isCalculatedComplete) {
+      console.log(`🛠️ Self-healing: Syncing isComplete status for user ${userId} to ${isCalculatedComplete}`);
+      await this.profileService.updateProfile(userId, { isComplete: isCalculatedComplete } as any);
+    }
+
     return {
-      isComplete: missing.length === 0,
+      isComplete: isCalculatedComplete,
       missing,
       completionPercentage: Math.round(((required.length - missing.length) / required.length) * 100),
     };

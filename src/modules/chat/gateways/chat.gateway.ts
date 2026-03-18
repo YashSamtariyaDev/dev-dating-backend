@@ -16,21 +16,16 @@ import { UsersService } from '../../users/services/users.service';
 
 @WebSocketGateway({
   cors: {
-    origin: [
-      'http://localhost',
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'http://192.168.1.35',
-      'http://192.168.1.35:3000',
-      'http://192.168.1.35:3001',
-      'https://localhost',
-      'https://localhost:3000',
-      'https://localhost:3001',
-      'file://',
-    ],
+    // Allow all origins in development; restrict to specific domains in production
+    // by setting FRONTEND_URL in the .env file
+    origin: process.env.FRONTEND_URL
+      ? [
+        process.env.FRONTEND_URL,
+        'http://localhost',
+        'http://localhost:3000',
+        'http://localhost:3001',
+      ]
+      : true, // true = allow all origins
     credentials: true,
   },
   transports: ['websocket', 'polling'],

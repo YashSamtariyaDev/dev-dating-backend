@@ -14,6 +14,23 @@ export class ProfileService {
     private readonly usersService: UsersService
   ) { }
 
+  /**
+   * 🔹 CENTRALIZED COMPLETION LOGIC
+   * This ensures consistency between the API responses and database state.
+   */
+  calculateIsComplete(profile: Profile): boolean {
+    const isComplete = Boolean(
+      profile.bio &&
+      profile.gender &&
+      profile.photoUrl &&
+      profile.techStack && profile.techStack.length > 0 &&
+      profile.experienceLevel &&
+      profile.location && profile.location.trim() !== ''
+    );
+
+    return isComplete;
+  }
+
   // 🔹 AUTO-CREATE PROFILE IF NOT EXISTS
   async getOrCreateProfile(userId: number): Promise<Profile> {
 
@@ -39,19 +56,16 @@ export class ProfileService {
   // 🔹 UPDATE PROFILE
   async updateProfile(userId: number, data: UpdateProfileDto) {
     const profile = await this.getOrCreateProfile(userId);
+    const oldStatus = profile.isComplete;
 
     Object.assign(profile, data);
 
-    // completion logic
-    profile.isComplete = Boolean(
-      profile.bio &&
-      profile.gender &&
-      profile.photoUrl &&
-      profile.techStack && profile.techStack.length > 0 &&
-      profile.experienceLevel &&
-      profile.location && profile.location.trim() !== ''
-    );
+    // Calculate new status
+    profile.isComplete = this.calculateIsComplete(profile);
 
+    if (oldStatus !== profile.isComplete) {
+      console.log(`👤 Profile completion status changed for user ${userId}: ${oldStatus} -> ${profile.isComplete}`);
+    }
 
     return this.profileRepo.save(profile);
   }
@@ -70,18 +84,11 @@ export class ProfileService {
     const profile = this.profileRepo.create({
       user,
       ...data,
-      isComplete: Boolean(
-        data.bio &&
-        data.gender &&
-        data.photoUrl &&
-        data.techStack && data.techStack.length > 0 &&
-        data.experienceLevel &&
-        data.location && data.location.trim() !== ''
-      ),
-
     });
+    
+    profile.isComplete = this.calculateIsComplete(profile);
+    
     return this.profileRepo.save(profile);
   }
 
 }
-
