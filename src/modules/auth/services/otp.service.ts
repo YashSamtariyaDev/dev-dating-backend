@@ -101,10 +101,15 @@ export class OtpService {
           createdAt: new Date().toISOString()
         };
 
+        const redisStartTime = Date.now();
         await this.redis.setex(`otp:${email}`, expiryTime, JSON.stringify(otpData));
+        const redisDuration = Date.now() - redisStartTime;
+        console.log(`💾 OTP stored in Redis for ${email} in ${redisDuration}ms`);
 
-        // Send OTP email using existing email service
-        await this.emailService.sendEmailVerificationOTP(email, otp, name);
+        // Send OTP email using existing email service - NON-BLOCKING
+        this.emailService.sendEmailVerificationOTP(email, otp, name).catch(error => {
+          console.error(`📧 Background email sending failed for ${email}:`, error.message);
+        });
 
         return {
           success: true,
@@ -115,7 +120,10 @@ export class OtpService {
         const otp = this.generateOTP();
         console.log(`🔧 Fallback mode - OTP for ${email}: ${otp}`);
         
-        await this.emailService.sendEmailVerificationOTP(email, otp, name);
+        // Send OTP email using existing email service - NON-BLOCKING
+        this.emailService.sendEmailVerificationOTP(email, otp, name).catch(error => {
+          console.error(`📧 Background fallback email sending failed for ${email}:`, error.message);
+        });
         
         return {
           success: true,

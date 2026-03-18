@@ -22,8 +22,9 @@ export class EmailService {
     console.log(`🔧 SMTP Config - Host: ${smtpHost}, User: ${smtpUser}`);
     
     if (smtpUser && smtpHost) {
+      const startTime = Date.now();
       try {
-        console.log('📤 Sending email via SMTP...');
+        console.log(`📤 Sending email via SMTP to ${email}...`);
         
         // Use template system properly
         await this.mailerService.sendMail({
@@ -37,10 +38,12 @@ export class EmailService {
             supportEmail: this.configService.get<string>('SUPPORT_EMAIL') || 'support@devdating.com',
           },
         });
-        console.log('✅ Email sent successfully!');
+        const duration = Date.now() - startTime;
+        console.log(`✅ Email sent successfully in ${duration}ms!`);
       } catch (error) {
-        console.log('❌ Email sending failed:', error.message);
-        console.log('🔧 Full error:', error);
+        const duration = Date.now() - startTime;
+        console.error(`❌ Email sending failed after ${duration}ms:`, error.message);
+        throw error; // Rethrow to let the caller handle it (or log it)
       }
     } else {
       console.log('⚠️ SMTP not configured - Email not sent');
@@ -141,8 +144,9 @@ export class EmailService {
     console.log(`� SMTP Config - Host: ${smtpHost}, User: ${smtpUser}`);
     
     if (smtpUser && smtpHost) {
+      const startTime = Date.now();
       try {
-        console.log('📤 Sending OTP email via SMTP...');
+        console.log(`📤 Sending OTP email via SMTP to ${email}...`);
         
         // Use template system properly
         await this.mailerService.sendMail({
@@ -156,10 +160,12 @@ export class EmailService {
             supportEmail: this.configService.get<string>('SUPPORT_EMAIL') || 'support@devdating.com',
           },
         });
-        console.log('✅ OTP email sent successfully!');
+        const duration = Date.now() - startTime;
+        console.log(`✅ OTP email sent successfully in ${duration}ms!`);
       } catch (error) {
-        console.log('❌ OTP email sending failed:', error.message);
-        console.log('🔧 Full error:', error);
+        const duration = Date.now() - startTime;
+        console.error(`❌ OTP email sending failed after ${duration}ms:`, error.message);
+        throw error; // Rethrow for fire-and-forget catch block
       }
     } else {
       console.log('⚠️ SMTP not configured - OTP email not sent');

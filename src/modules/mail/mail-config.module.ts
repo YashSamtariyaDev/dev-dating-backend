@@ -18,6 +18,11 @@ import { join } from 'path';
             user: configService.get<string>('SMTP_USER'),
             pass: configService.get<string>('SMTP_PASS'),
           },
+          tls: {
+            rejectUnauthorized: false, // Often needed in cloud environments
+          },
+          connectionTimeout: 10000, // 10 seconds
+          greetingTimeout: 10000,   // 10 seconds
         },
         defaults: {
           from: `"${configService.get<string>('APP_NAME') || 'DevDating'}" <${configService.get<string>('SMTP_FROM') || 'noreply@devdating.com'}>`,
