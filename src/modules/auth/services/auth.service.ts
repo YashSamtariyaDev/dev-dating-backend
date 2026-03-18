@@ -7,6 +7,7 @@ import { UserRole } from '../../users/enum/user-role.enum';
 import { UsersService } from '../../users/services/users.service';
 import { OtpService } from './otp.service';
 import { EmailService } from '../../mail/email.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
     private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
   ) {}
 
   async initiateRegistration(dto: RegisterDto) {
@@ -24,6 +26,32 @@ export class AuthService {
       throw new UnauthorizedException('User with this email already exists');
     }
 
+    const enableVerification = this.configService.get<string>('ENABLE_EMAIL_VERIFICATION') !== 'false';
+
+    if (!enableVerification) {
+      console.log(`🚀 Email verification disabled. Creating user directly for ${dto.email}`);
+      const user = await this.usersService.createUser({
+        email: dto.email,
+        password: dto.password,
+        name: dto.name,
+      });
+
+      // Mark email as verified immediately
+      await this.usersService.updateEmailVerification(user.id, true);
+
+      // Generate token for immediate login
+      const payload = { sub: user.id, email: user.email, role: user.role };
+      const accessToken = this.jwtService.sign(payload);
+
+      return {
+        success: true,
+        message: 'User registered successfully (verification skipped)',
+        userId: user.id,
+        accessToken,
+        requiresVerification: false,
+      };
+    }
+
     // Send OTP for email verification
     const result = await this.otpService.sendOTP(dto.email, dto.name);
     
@@ -31,6 +59,7 @@ export class AuthService {
       message: result.message || 'OTP sent to your email for verification',
       email: dto.email,
       success: result.success,
+      requiresVerification: true,
     };
   }
 
