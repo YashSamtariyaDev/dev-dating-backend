@@ -7,25 +7,25 @@ export class EmailService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async sendEmailVerification(email: string, verificationToken: string) {
     const verificationUrl = `${this.configService.get<string>('FRONTEND_URL') || 'https://localhost:3000'}/verify-email?token=${verificationToken}`;
-    
+
     console.log(`📧 Email Verification - To: ${email}`);
     console.log(`📧 Verification URL: ${verificationUrl}`);
-    
+
     // Check if SMTP is configured
     const smtpUser = this.configService.get<string>('SMTP_USER');
     const smtpHost = this.configService.get<string>('SMTP_HOST');
-    
+
     console.log(`🔧 SMTP Config - Host: ${smtpHost}, User: ${smtpUser}`);
-    
+
     if (smtpUser && smtpHost) {
       const startTime = Date.now();
       try {
         console.log(`📤 Sending email via SMTP to ${email}...`);
-        
+
         // Use template system properly
         await this.mailerService.sendMail({
           to: email,
@@ -53,18 +53,18 @@ export class EmailService {
 
   async sendAccountDeactivationConfirmation(email: string, name: string) {
     console.log(`📧 Account Deactivated - To: ${email}, Name: ${name}`);
-    
+
     const smtpUser = this.configService.get<string>('SMTP_USER');
     const smtpHost = this.configService.get<string>('SMTP_HOST');
-    
+
     console.log(`🔧 SMTP Config - Host: ${smtpHost}, User: ${smtpUser}`);
-    
+
     if (smtpUser && smtpHost) {
       try {
         console.log('📤 Sending deactivation email via SMTP...');
-        
+
         const reactivationUrl = `${this.configService.get<string>('FRONTEND_URL') || 'https://localhost:3000'}/reactivate`;
-        
+
         // Use template system properly
         await this.mailerService.sendMail({
           to: email,
@@ -90,7 +90,7 @@ export class EmailService {
 
   async sendAccountDeletionConfirmation(email: string, name: string) {
     console.log(`📧 Account Deleted - To: ${email}, Name: ${name}`);
-    
+
     if (this.configService.get<string>('SMTP_USER')) {
       try {
         await this.mailerService.sendMail({
@@ -111,10 +111,10 @@ export class EmailService {
 
   async sendAccountDeletionRequest(email: string, name: string, deletionToken: string) {
     const deletionUrl = `${this.configService.get<string>('FRONTEND_URL') || 'https://localhost:3000'}/confirm-delete?token=${deletionToken}`;
-    
+
     console.log(`📧 Account Deletion Request - To: ${email}, Name: ${name}`);
     console.log(`📧 Deletion URL: ${deletionUrl}`);
-    
+
     if (this.configService.get<string>('SMTP_USER')) {
       try {
         await this.mailerService.sendMail({
@@ -136,18 +136,18 @@ export class EmailService {
 
   async sendEmailVerificationOTP(email: string, otp: string, name: string) {
     console.log(`📧 Email Verification OTP - To: ${email}, OTP: ${otp}`);
-    
+
     // Check if SMTP is configured
     const smtpUser = this.configService.get<string>('SMTP_USER');
     const smtpHost = this.configService.get<string>('SMTP_HOST');
-    
+
     console.log(`� SMTP Config - Host: ${smtpHost}, User: ${smtpUser}`);
-    
+
     if (smtpUser && smtpHost) {
       const startTime = Date.now();
       try {
         console.log(`📤 Sending OTP email via SMTP to ${email}...`);
-        
+
         // Use template system properly
         await this.mailerService.sendMail({
           to: email,

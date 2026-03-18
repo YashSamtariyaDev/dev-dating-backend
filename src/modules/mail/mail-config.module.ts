@@ -43,4 +43,4 @@ import { join } from 'path';
   ],
   exports: [MailerModule],
 })
-export class MailConfigModule {}
+export class MailConfigModule { }

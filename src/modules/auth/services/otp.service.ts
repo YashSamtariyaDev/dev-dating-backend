@@ -24,7 +24,7 @@ export class OtpService {
     }
 
     this.connectionAttempts++;
-    
+
     try {
       this.redis = new Redis({
         host: this.configService.get('REDIS_HOST') || 'localhost',
@@ -54,7 +54,7 @@ export class OtpService {
 
       // Try to connect
       await this.redis.connect();
-      
+
     } catch (error) {
       console.log('⚠️ Redis not available, OTP system will use fallback mode');
       this.redisConnected = false;
@@ -76,7 +76,7 @@ export class OtpService {
     try {
       // Check Redis connection
       const redisAvailable = await this.checkRedisConnection();
-      
+
       if (redisAvailable) {
         // Check if OTP already exists and is not expired
         const existingOTP = await this.redis.get(`otp:${email}`);
@@ -101,15 +101,10 @@ export class OtpService {
           createdAt: new Date().toISOString()
         };
 
-        const redisStartTime = Date.now();
         await this.redis.setex(`otp:${email}`, expiryTime, JSON.stringify(otpData));
-        const redisDuration = Date.now() - redisStartTime;
-        console.log(`💾 OTP stored in Redis for ${email} in ${redisDuration}ms`);
 
-        // Send OTP email using existing email service - NON-BLOCKING
-        this.emailService.sendEmailVerificationOTP(email, otp, name).catch(error => {
-          console.error(`📧 Background email sending failed for ${email}:`, error.message);
-        });
+        // Send OTP email using existing email service
+        await this.emailService.sendEmailVerificationOTP(email, otp, name);
 
         return {
           success: true,
@@ -119,12 +114,9 @@ export class OtpService {
         // Fallback mode - send OTP without Redis storage
         const otp = this.generateOTP();
         console.log(`🔧 Fallback mode - OTP for ${email}: ${otp}`);
-        
-        // Send OTP email using existing email service - NON-BLOCKING
-        this.emailService.sendEmailVerificationOTP(email, otp, name).catch(error => {
-          console.error(`📧 Background fallback email sending failed for ${email}:`, error.message);
-        });
-        
+
+        await this.emailService.sendEmailVerificationOTP(email, otp, name);
+
         return {
           success: true,
           message: 'OTP sent successfully to your email (fallback mode)',
@@ -143,10 +135,10 @@ export class OtpService {
     try {
       // Check Redis connection
       const redisAvailable = await this.checkRedisConnection();
-      
+
       if (redisAvailable) {
         const storedData = await this.redis.get(`otp:${email}`);
-        
+
         if (!storedData) {
           return {
             success: false,
@@ -155,7 +147,7 @@ export class OtpService {
         }
 
         const otpData = JSON.parse(storedData);
-        
+
         if (otpData.code !== otp) {
           return {
             success: false,
@@ -202,7 +194,7 @@ export class OtpService {
     try {
       // Check Redis connection
       const redisAvailable = await this.checkRedisConnection();
-      
+
       if (redisAvailable) {
         const storedData = await this.redis.get(`otp:${email}`);
         if (!storedData) {
