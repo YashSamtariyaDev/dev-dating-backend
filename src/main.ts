@@ -57,7 +57,6 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 
   const protocol = httpsOptions ? 'https' : 'http';
-  const host = '192.168.1.35'; // Local IP
-  Logger.log(`🚀 Application is running on: ${protocol}://${host}:${port}`, 'Bootstrap');
+  Logger.log(`🚀 Application is running on: ${protocol}://0.0.0.0:${port}`, 'Bootstrap');
 }
 bootstrap();

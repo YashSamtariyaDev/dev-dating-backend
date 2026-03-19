@@ -1,23 +1,25 @@
-# Use Node LTS
-FROM node:20
+# ---------- BUILD STAGE ----------
+FROM node:20-alpine AS builder
 
-# Working directory
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy project
 COPY . .
-
-# Build NestJS app
 RUN npm run build
 
-# Expose API port
+# ---------- PRODUCTION STAGE ----------
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Only copy required files
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+
+RUN npm ci --omit=dev
+
 EXPOSE 3000
 
-# Start NestJS app
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/src/main.js"]

@@ -28,7 +28,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AccountModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      // No envFilePath means it will only look for environment variables
+      // or a default .env in the current directory if it exists.
+      // This is better for Docker environments where variables are injected.
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
